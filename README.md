@@ -31,7 +31,14 @@ git diff
 git add [path]
 eg: git add testingNode/index.js
 
-# commit files added and push to GitHub
+# remove a deleted file from git (and save that it was deleted in a commit)
+git rm [path]
+
+# remove an accidentally added (git add) file
+git reset [path to accidentally added file]
+eg. git reset .gitignore
+
+# commit files and changes added, then push to GitHub
 git commit -m "This is the commit message"
 git push
 ```
