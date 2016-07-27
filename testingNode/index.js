@@ -1,11 +1,15 @@
-console.log('Starting node script')
+// Practice
+const myModule = require('./practice1.js')
 
-var postfix = 'thing..'
-var prefix = 'Number: '
-
-for (var i = 0; i < 10; i++) {
-  console.log(`Ooooh ${i} ${postfix}`)
-}
+var bankAccount = 500
+var amount = 0
 
 
-console.log('Node script end')
+
+var cost = myModule.costBeforeTax(amount, bankAccount)
+
+var costAfterTax = myModule.tax(cost)
+
+var formattedCost = myModule.formattedCost(costAfterTax)
+
+console.log(formattedCost);
