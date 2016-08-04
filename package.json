@@ -25,7 +25,7 @@
   "homepage": "https://github.com/ErlendS/learning#readme",
   "ava": {
     "files": [
-      "cards/**/__tests__/**-spec.js",
-    ],
+      "cards/**/__tests__/**-spec.js"
+    ]
   }
 }
