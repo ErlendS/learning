@@ -10,7 +10,8 @@
     "ava": "^0.15.2"
   },
   "scripts": {
-    "test": "NODE_ENV=test ava"
+    "test": "NODE_ENV=test ava",
+    "watch": "NODE_ENV=test ava -w cards/**/*.js"
   },
   "repository": {
     "type": "git",
@@ -21,10 +22,5 @@
   "bugs": {
     "url": "https://github.com/ErlendS/learning/issues"
   },
-  "homepage": "https://github.com/ErlendS/learning#readme",
-  "ava": {
-    "files": [
-      "cards/**/__tests__/**-spec.js"
-    ]
-  }
+  "homepage": "https://github.com/ErlendS/learning#readme"
 }

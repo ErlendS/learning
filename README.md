@@ -41,6 +41,13 @@ eg. git reset .gitignore
 # commit files and changes added, then push to GitHub
 git commit -m "This is the commit message"
 git push
+
+# pull files from github
+git pull
+
+# stage all modified files for commit and add commit message
+git commit -am ""
+
 ```
 
 #### Reverting changes
@@ -61,7 +68,13 @@ git checkout [commit id]
 git clone [url]
 eg: git clone git@github.com:ErlendS/learning.git
 ```
+### NodePackageManager -- npm
+```
+# run npm commands
+npm run [command]
+eg: npm run watch
 
+```
 
 ### Javascript resources
 
