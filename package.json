@@ -1,0 +1,31 @@
+{
+  "name": "learning",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "ava": "^0.15.2",
+    "ramda": "^0.21.0"
+  },
+  "devDependencies": {
+    "ava": "^0.15.2"
+  },
+  "scripts": {
+    "test": "NODE_ENV=test ava"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ErlendS/learning.git"
+  },
+  "author": "Erlend Seppola",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ErlendS/learning/issues"
+  },
+  "homepage": "https://github.com/ErlendS/learning#readme",
+  "ava": {
+    "files": [
+      "cards/**/__tests__/**-spec.js",
+    ],
+  }
+}
