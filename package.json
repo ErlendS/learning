@@ -4,7 +4,6 @@
   "description": "",
   "main": "index.js",
   "dependencies": {
-    "ava": "^0.15.2",
     "ramda": "^0.21.0"
   },
   "devDependencies": {
