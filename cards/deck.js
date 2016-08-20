@@ -40,25 +40,20 @@ function generateDeck() {
    return deck;
  }
 
-
 function insertIntoSortedArray(x, sortedArray, compareFn) {
-  // sammenligner x mot sortedArray og legger x inn i sortedArray
-  if (sortedArray.length === 0) {
-    sortedArray.push(x)
-    return sortedArray
-  }
+  // 1. find index
+  let i = 0
+  while(i < sortedArray.length && compareFn(sortedArray[i], x) === -1)
+    i++
 
-  let done = false
-  for (let i = 0; i < sortedArray.length; i++) {
-    if (compareFn(sortedArray[i], x) === 1 || compareFn(sortedArray[i], x) === 0) {
-      sortedArray.splice(i, 0, x)
-      done = true
-      break
-    }
-  }
-  if (!done) {
-    sortedArray.push(x)
-  }
+  // 2. insert at i
+  /* NOTE: from the splice documentation:
+   "If greater than the length of the array, actual starting index will be set
+   to the length of the array."
+   So if i > sortedArray.length it still inserts from the end of the array
+  */
+  sortedArray.splice(i, 0, x)
+
   return sortedArray
 }
 
