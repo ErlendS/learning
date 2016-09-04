@@ -92,7 +92,10 @@ function compareCardValues (card1, card2) {
     return -1
   }
 }
+function generateShuffledDeck() {
+  return shuffle(generateDeck())
 
+}
 
  module.exports = {
    generateDeck,
@@ -101,4 +104,5 @@ function compareCardValues (card1, card2) {
    cardValue,
    createSortFn,
    compareCardValues,
+   generateShuffledDeck,
  }
