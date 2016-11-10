@@ -7,7 +7,7 @@ const SUIT_ORDER = ['S', 'C', 'H', 'D']
 
 function generateSuit(suitType) {
   const suitArray = [];
-  for (var i = 2; i <= 14; i++) {
+  for (let i = 2; i <= 14; i++) {
      suitArray.push(suitType + "_" + i)
   }
   return suitArray;
@@ -16,7 +16,7 @@ function generateSuit(suitType) {
 function generateDeck() {
   let deck = [];
   const suits = SUIT_ORDER
-  for (var i = 0; i < 4; i++) {
+  for (let i = 0; i < 4; i++) {
       deck = deck.concat(generateSuit(suits[i]))
   }
   return deck;
@@ -30,10 +30,10 @@ function generateDeck() {
    function positionInArray() {
      return Number.parseInt(Math.random() * 1000000 % 52)
    }
-   for(var i = 0; i < 15000; i++) {
-     let firstPosition = positionInArray()
-     let secondPosition = positionInArray()
-     let anyCard = deck[firstPosition]
+   for(let i = 0; i < 15000; i++) {
+     const firstPosition = positionInArray()
+     const secondPosition = positionInArray()
+     const anyCard = deck[firstPosition]
      deck[firstPosition] = deck[secondPosition]
      deck[secondPosition] = anyCard
    }
@@ -85,7 +85,7 @@ function compareCardValues (card1, card2) {
   if (v1 > v2 ) {
     return 1
   }
-  if (v1 == v2) {
+  if (v1 === v2) {
     return 0
   }
   if (v1 < v2) {
