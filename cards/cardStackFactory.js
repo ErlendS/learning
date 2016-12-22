@@ -1,8 +1,12 @@
 // push, pop, get, set, random, sort, insert
 
+const popper = (state) => ({
+  pop: () => state.stack.pop()
+})
+
 const pusher = (state) => ({
   push: (card) => state.stack.push(card),
-  append: (cards = []) => {
+  concat: (cards = []) => {
     state.stack = state.stack.concat(cards)
   }
 })
@@ -15,7 +19,6 @@ const getter = (state) => ({
   getAll: () => state.stack,
   getN: (n) => state.stack.splice(-n, n),
   getAtIndex: (i) => {
-    console.log(`Getting card: ${i}`);
     return state.stack.splice(i, 1)
   },
 })
@@ -28,7 +31,7 @@ const cardStackFactory = (arrayOfCards = []) => {
   return Object.assign(
     {},
     pusher(state),
-    // poper(state),
+    popper(state),
     getter(state),
     setter(state)
     // randomizer(state),

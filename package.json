@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "dependencies": {
-    "ramda": "^0.21.0"
+    "lodash": "^4.17.2",
+    "ramda": "^0.21.0",
+    "uuid": "^3.0.1"
   },
   "devDependencies": {
     "ava": "^0.15.2"
