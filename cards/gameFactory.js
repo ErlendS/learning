@@ -12,6 +12,7 @@ module.exports = function makeGame(initState = {}) {
     round: 0,
     deck: CardStack(createDeck()),
     currentPlayer: null,
+    pickedCards: {},
     history: [],
     lifecycle: {
       initGame: () => {},
@@ -63,13 +64,12 @@ function startGame(gameState) {
 function oneRound(gameState) {
   for (let i = 0; i < gameState.players.length; i++) {
     gameState.currentPlayer = gameState.players[i]
+    console.log('Current Player is ' + gameState.currentPlayer.name)
+
     if (!gameState.currentPlayer.isDone()) {
       gameState = gameState.lifecycle.makeMove(gameState)
-      // get currentPlayer cards
-      // _players[i].hand
-      // choose a random card to use
-      // put choosen card top of tableStack.
     }
+
     if (!gameState.lifecycle.validateStack(gameState)) {
       gameState.lifecycle.undoLastMove(gameState)
       i--

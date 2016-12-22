@@ -102,6 +102,7 @@ function generateShuffledDeck() {
    generateSuit,
    shuffle,
    cardValue,
+   cardSuit,
    createSortFn,
    compareCardValues,
    generateShuffledDeck,
