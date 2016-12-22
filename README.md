@@ -68,11 +68,16 @@ git checkout [commit id]
 git clone [url]
 eg: git clone git@github.com:ErlendS/learning.git
 ```
-### NodePackageManager -- npm
+
+
+### Node Package Manager -- npm
 ```
-# run npm commands
-npm run [command]
-eg: npm run watch
+# install
+npm install [package_name]
+eg: npm install lodash
+
+# install and save to dependencies
+npm install [package_name] --save
 
 ```
 
