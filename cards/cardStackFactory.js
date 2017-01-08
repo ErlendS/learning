@@ -23,6 +23,9 @@ const getter = (state) => ({
   },
 })
 
+// TODO: Remove abstraction layer, return array directly
+// setter and getter methods have to be rewritten
+// inline.
 const cardStackFactory = (arrayOfCards = []) => {
   const state = {
     stack: arrayOfCards

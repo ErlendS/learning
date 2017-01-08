@@ -1,6 +1,8 @@
 const R = require('ramda')
+const chalk = require ('chalk')
 const CardStack = require('./cardStackFactory.js')
 const Deck = require('./deck.js')
+
 
 const createDeck = Deck.generateShuffledDeck
 
@@ -64,8 +66,8 @@ function startGame(gameState) {
 function oneRound(gameState) {
   for (let i = 0; i < gameState.players.length; i++) {
     gameState.currentPlayer = gameState.players[i]
-    console.log('Current Player is ' + gameState.currentPlayer.name)
-
+    console.log(chalk.italic.green('Current Player is ' + gameState.currentPlayer.name))
+    console.log(chalk.italic.red('Player Hand ---' + gameState.currentPlayer.getHand()));
     if (!gameState.currentPlayer.isDone()) {
       gameState = gameState.lifecycle.makeMove(gameState)
     }

@@ -25,10 +25,10 @@ function generateDeck() {
  // omplasser to tilfeldige verdier i deck arrayen 15000 ganger
  function shuffle(_deck) {
    const deck = R.clone(_deck)
-
+   const nCards = _deck.length
    // velg et tilfeldig tall mellom 0-51
    function positionInArray() {
-     return Number.parseInt(Math.random() * 1000000 % 52)
+     return Number.parseInt(Math.random() * 1000000 % nCards)
    }
    for(let i = 0; i < 15000; i++) {
      const firstPosition = positionInArray()

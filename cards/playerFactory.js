@@ -1,4 +1,5 @@
 const uuid = require('uuid/v4')
+const chalk = require ('chalk')
 const CardStack = require('./cardStackFactory.js')
 
 const randomN = (n) => Math.floor(Math.random() * 1000000) % n
@@ -27,9 +28,9 @@ const playerFactory = (name) => {
       const hand = state.hand.getAll()
       let hasUniqueCards = true
       const isUniqueCard = (card) => currentRoundCache.indexOf(card) === -1
-      console.log(currentRoundCache);
+      console.log(chalk.underline(`Attempted cards ${currentRoundCache}`));
       const uniqueCards = hand.filter(isUniqueCard)
-      console.log(`Players unique cards ----> `+ uniqueCards);
+      console.log(chalk.underline.magenta(`Players unique cards ----> `+ uniqueCards));
       if (uniqueCards.length === 0) {
         hasUniqueCards = false
       }
@@ -38,8 +39,7 @@ const playerFactory = (name) => {
         const indexOfuCard = hand.indexOf(uCard)
         const [cardToPlace] = state.hand.getAtIndex(indexOfuCard)
         currentRoundCache.push(cardToPlace)
-        console.log('cardToPlace');
-        console.log(cardToPlace);
+        console.log(chalk.underline.yellow('CardToPlace -> ' + cardToPlace));
         return [cardToPlace]
 
         /* TODO:

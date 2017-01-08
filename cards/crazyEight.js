@@ -1,7 +1,9 @@
+const { get, set, flatten } = require('lodash');
+const { type } = require('ramda');
+const chalk = require ('chalk')
 const makeGame = require('./gameFactory.js');
 const Deck = require('./deck.js')
 const Player = require('./playerFactory.js');
-const { get, set } = require('lodash');
 
 const NUMBER_OF_PLAYERS = 4
 
@@ -35,27 +37,30 @@ function initGame(game) {
     console.error('Warning: you 99% surly have too many players.');
   }
 
-  // const randomNumberOf = n => {
-  //   return Math.floor(Math.random() * 1000000) % n
-  // }
-  //
-  // function attemptPlaceFistCard() {
-  //   let card = getCardsFromDeck(1)
-  //   if (card.includes('8')) {
-  //     // place card back in random position in deck
-  //     game.deck.splice(randomNumberOf(game.deck.length), 0, card)
-  //     return attemptPlaceFistCard()
-  //   }
-  //   function placeCardOnTopOfTableStack(card, tableStack) {}
-  // }
   return game
 }
 // player_1 start game
-
 function makeMove(game) {
-  const { currentPlayer, tableStack } = game
-  const theMove = currentPlayer.makeMove(game.round)
+  const { currentPlayer, tableStack, deck } = game
+  const cardsLeftInDeck = deck.getAll().length
+ console.log(cardsLeftInDeck + ' CARDSLEFT');
+ if (cardsLeftInDeck === 0) {
+   console.log(`Shuffling tablestack`);
+   const prevMove = tableStack.getN(1)
+   const cardsToShuffle = flatten(tableStack.getAll())
+   const newDeck = Deck.shuffle(cardsToShuffle)
 
+   console.log(require('util').inspect(prevMove, { depth: null }));
+   console.log(require('util').inspect(newDeck, { depth: null }));
+   deck.set(newDeck)
+   tableStack.set(prevMove)
+  //feil -- tablestack.clear.push(currentCard)
+   // deck = currentCard
+ }
+  // TODO: When deck is empty shuffe tablestack.
+  // remove and shuffle all cards except top card in
+  // tablestack. place shuffled cards in deck.
+  const theMove = currentPlayer.makeMove(game.round)
   if (theMove === null) {
     const {pickedCards, round } = game
     let penaltyCards = get(game, ['pickedCards', currentPlayer.id, round], [])
@@ -73,44 +78,57 @@ function makeMove(game) {
     return makeMove(game)
   }
 
-  console.log(`==> MAKE MOVE: Player ${currentPlayer.name} – ${theMove}`);
-  // console.log(theMove);
-
-
   tableStack.push(theMove)
-    return game
-
-
-
-
+  return game
 }
+
+
+
 function validateMove(currentMove, prevMove, currentPlayer) {
+  if (type(currentMove[0]) !== 'String') {
+    console.log(require('util').inspect(currentMove, { depth: null }));
+    console.log(require('util').inspect(currentMove[0], { depth: null }));
+    console.log(typeof currentMove[0]);
+
+    console.log(chalk.red('Warning: No card found in move!'));
+    throw Error('I TOLD YOU MOTHERFUCKER! CURRENTMOVE IS NOT AN ARRAY!')
+  }
   const card = currentMove[0]
   const lastCard = prevMove[0]
   const hand = currentPlayer.getHand()
 // TODO: run card through elimination process instead.
-  if (Deck.cardValue(card) === 8 && hand.length !== 0) {
-    console.log('==> Cannot finish with an 8');
+
+  const cardVal  = Deck.cardValue(card)
+  const hasMoreCards = hand.length !== 0
+
+
+  if (cardVal === 8 && hasMoreCards) {
+    console.log('==> Valid move, can finish with an 8');
     return true
   }
   if (Deck.cardSuit(card) === Deck.cardSuit(lastCard)) {
-    console.log(`==> Wrong suit, should be ${Deck.cardSuit(lastCard)}`);
+    console.log(`==> Valid move, suit is ${Deck.cardSuit(lastCard)}`);
     return true
   }
   if (Deck.cardValue(card) === Deck.cardValue(lastCard)) {
-    console.log(`==> Wrong value, should be ${Deck.cardValue(lastCard)}`);
+    console.log(`==> Valid move, value is ${Deck.cardValue(lastCard)}`);
     return true
   }
+  console.log(`Invalid move: ${card} on ${lastCard}`);
   return false
 }
 
 function validateStack(game) {
   const stackOfCards = game.tableStack.getAll()
+  if (stackOfCards.length <= 1) {
+    return true
+  }
 
   const i = stackOfCards.length - 1
   const currentMove = stackOfCards[i]
   const prevCard = stackOfCards[i - 1]
   const currentPlayer = game.currentPlayer
+  console.log(chalk.white(`Table card is ${prevCard}, attempting to place "${currentMove}"`));
   return validateMove(currentMove, prevCard, currentPlayer)
 
 }
@@ -131,7 +149,7 @@ function afterRound(game) {
     player.isDone() && allDone, true
   )
   console.log('<><><><><><><><><><><><><><><><><><><><><><><><><>');
-  if (game.round > 1 || playersDone)
+  if (game.round > 20 || playersDone)
     game.isDone = true
 
   return game
