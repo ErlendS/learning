@@ -66,20 +66,20 @@ function startGame(gameState) {
 function oneRound(gameState) {
   for (let i = 0; i < gameState.players.length; i++) {
     gameState.currentPlayer = gameState.players[i]
-    console.log(chalk.italic.green('Current Player is ' + gameState.currentPlayer.name))
+    console.log(chalk.italic.green('Current Player is ' + gameState.currentPlayer.name + ' and player is done is ' + gameState.currentPlayer.isDone()))
     console.log(chalk.italic.red('Player Hand ---' + gameState.currentPlayer.getHand()));
     if (!gameState.currentPlayer.isDone()) {
       gameState = gameState.lifecycle.makeMove(gameState)
+      if (!gameState.lifecycle.validateStack(gameState)) {
+        gameState.lifecycle.undoLastMove(gameState)
+        i--
+        continue
+      }
+
+      gameState.lifecycle.afterPlayEffect(gameState)
     }
 
-    if (!gameState.lifecycle.validateStack(gameState)) {
-      gameState.lifecycle.undoLastMove(gameState)
-      i--
-      continue
-    }
 
-    gameState.lifecycle.afterPlayEffect(gameState)
-    // if unvalid move, currentPlayer same,
     // get last tableStack (or remove last value)
     // OBS ------>  !i++
   }

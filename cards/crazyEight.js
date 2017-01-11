@@ -148,8 +148,9 @@ function afterRound(game) {
   const playersDone = game.players.reduce((allDone, player) =>
     player.isDone() && allDone, true
   )
+  console.log('Round ' + game.round);
   console.log('<><><><><><><><><><><><><><><><><><><><><><><><><>');
-  if (game.round > 20 || playersDone)
+  if (game.round > 100 || playersDone)
     game.isDone = true
 
   return game
