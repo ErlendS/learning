@@ -14,6 +14,7 @@ module.exports = function makeGame(initState = {}) {
     round: 0,
     deck: CardStack(createDeck()),
     currentPlayer: null,
+    ranking: [],
     pickedCards: {},
     history: [],
     lifecycle: {
@@ -59,15 +60,16 @@ function startGame(gameState) {
     gameState = oneRound(R.clone(gameState))
     gameState.round = gameState.round + 1
   }
-
+  console.log('The Winners are ' + gameState.ranking.toString());
   console.log('game over');
 }
 
 function oneRound(gameState) {
   for (let i = 0; i < gameState.players.length; i++) {
     gameState.currentPlayer = gameState.players[i]
-    console.log(chalk.italic.green('Current Player is ' + gameState.currentPlayer.name + ' and player is done is ' + gameState.currentPlayer.isDone()))
-    console.log(chalk.italic.red('Player Hand ---' + gameState.currentPlayer.getHand()));
+    const player = gameState.currentPlayer
+    console.log(`It is ${player.getName()} and players hand is ${player.getHand()}`);
+    // won't get hand
     if (!gameState.currentPlayer.isDone()) {
       gameState = gameState.lifecycle.makeMove(gameState)
       if (!gameState.lifecycle.validateStack(gameState)) {
@@ -79,10 +81,8 @@ function oneRound(gameState) {
       gameState.lifecycle.afterPlayEffect(gameState)
     }
 
-
-    // get last tableStack (or remove last value)
-    // OBS ------>  !i++
   }
   gameState.lifecycle.afterRound(gameState)
+
   return gameState
 }

@@ -148,10 +148,19 @@ function afterRound(game) {
   const playersDone = game.players.reduce((allDone, player) =>
     player.isDone() && allDone, true
   )
+    const {ranking, players } = game
+    const nPlayers = players.length
+    for (let i = 0; i < nPlayers; i++) {
+      const player = players[i]
+      if (player.isDone() && !ranking.includes(player.getName())) {
+        return ranking.push(player.getName())
+        }
+      }
+
+
   console.log('Round ' + game.round);
   console.log('<><><><><><><><><><><><><><><><><><><><><><><><><>');
   if (game.round > 100 || playersDone)
     game.isDone = true
-
   return game
 }

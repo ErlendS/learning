@@ -42,18 +42,13 @@ const playerFactory = (name) => {
         console.log(chalk.underline.yellow('CardToPlace -> ' + cardToPlace));
         return [cardToPlace]
 
-        /* TODO:
-        returning null forces player to pick one new card
-          if he has 0 uniqueCards, reciveOneCard, and add +1
-          on cardsRecivedThisRound
-          maximum 3 times
-          after 3 times on to next player
-        */
       }
       console.log(`HAS NO UNIQUE CARDS`);
       return null
     },
     getHand: () => state.hand.getAll(),
+
+    getName: () => state.name,
 
     printCards: () => {
       console.log(state.hand.toString())
