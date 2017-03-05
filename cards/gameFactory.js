@@ -10,6 +10,7 @@ module.exports = function makeGame(initState = {}) {
   let gameState = {
     id: "001",
     players: [],
+    playerOrder: [],
     tableStack: CardStack(),
     round: 0,
     deck: CardStack(createDeck()),
@@ -24,6 +25,15 @@ module.exports = function makeGame(initState = {}) {
       undoLastMove: () => {},
       afterPlayEffect: () => {},
       afterRound: () => {},
+      setPlayerOrder: (_gameState) => {
+        const n = _gameState.players.length
+        const order = []
+        for (let i = 0; i < n; i++) {
+          order.push(i)
+        }
+        _gameState.playerOrder = order
+        return _gameState
+      },
     }
   }
 
@@ -45,12 +55,12 @@ module.exports = function makeGame(initState = {}) {
   )
 }
 
-
 function startGame(gameState) {
   console.log('game started');
   const history = []
 
   gameState = gameState.lifecycle.initGame(R.clone(gameState))
+  gameState = gameState.lifecycle.setPlayerOrder(R.clone(gameState))
 
   while (!gameState.isDone) {
     console.log('-=-=--=-=- Starting round ' + gameState.round);
@@ -66,10 +76,9 @@ function startGame(gameState) {
 
 function oneRound(gameState) {
   for (let i = 0; i < gameState.players.length; i++) {
-    gameState.currentPlayer = gameState.players[i]
+    const n = gameState.playerOrder[i]
+    gameState.currentPlayer = gameState.players[n]
     const player = gameState.currentPlayer
-    console.log(`It is ${player.getName()} and players hand is ${player.getHand()}`);
-    // won't get hand
     if (!gameState.currentPlayer.isDone()) {
       gameState = gameState.lifecycle.makeMove(gameState)
       if (!gameState.lifecycle.validateStack(gameState)) {

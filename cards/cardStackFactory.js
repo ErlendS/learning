@@ -12,7 +12,7 @@ const pusher = (state) => ({
 })
 
 const setter = (state) => ({
-  set: (deck) => state.stack = deck
+  set: (deck) => state.stack = deck,
 })
 
 const getter = (state) => ({
@@ -36,7 +36,8 @@ const cardStackFactory = (arrayOfCards = []) => {
     pusher(state),
     popper(state),
     getter(state),
-    setter(state)
+    setter(state),
+    { isEmpty: () => state.stack.length === 0 }
     // randomizer(state),
     // sorter(state),
     // inserter(state)

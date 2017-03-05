@@ -4,6 +4,11 @@ const chalk = require ('chalk')
 const makeGame = require('./gameFactory.js');
 const Deck = require('./deck.js')
 const Player = require('./playerFactory.js');
+const CardStack = require('./cardStackFactory.js')
+
+
+const randomN = (n) => Math.floor(Math.random() * 1000000) % n
+
 
 const NUMBER_OF_PLAYERS = 4
 
@@ -18,7 +23,11 @@ crazyEightAPI.setLifecycle('afterPlayEffect', afterPlayEffect)
 crazyEightAPI.setLifecycle('afterRound', afterRound)
 
 for (let i = 0; i < NUMBER_OF_PLAYERS; i++) {
-  crazyEightAPI.addPlayer(Player('player_' + i))
+  const name = 'player_' + i
+  crazyEightAPI.addPlayer(Player(name, {
+    makeMove: playerMakeMove,
+    initHand: CardStack,
+  }))
 }
 
 crazyEightAPI.playGame()
@@ -26,7 +35,7 @@ crazyEightAPI.playGame()
 function initGame(game) {
   for (let i = 0; i < NUMBER_OF_PLAYERS; i++) {
     const someCards = game.deck.getN(6)
-    game.players[i].receiveCards(someCards)
+    game.players[i].getHand().concat(someCards)
   }
 
   const [oneCard] = game.deck.getN(1)
@@ -39,7 +48,6 @@ function initGame(game) {
 
   return game
 }
-// player_1 start game
 function makeMove(game) {
   const { currentPlayer, tableStack, deck } = game
   const cardsLeftInDeck = deck.getAll().length
@@ -54,19 +62,15 @@ function makeMove(game) {
    console.log(require('util').inspect(newDeck, { depth: null }));
    deck.set(newDeck)
    tableStack.set(prevMove)
-  //feil -- tablestack.clear.push(currentCard)
-   // deck = currentCard
  }
-  // TODO: When deck is empty shuffe tablestack.
-  // remove and shuffle all cards except top card in
-  // tablestack. place shuffled cards in deck.
+
   const theMove = currentPlayer.makeMove(game.round)
   if (theMove === null) {
     const {pickedCards, round } = game
     let penaltyCards = get(game, ['pickedCards', currentPlayer.id, round], [])
     if (penaltyCards.length <= 2) {
       const cards = game.deck.getN(1)
-      currentPlayer.receiveCards(cards)
+      currentPlayer.getHand().concat(cards)
       penaltyCards = penaltyCards.concat(cards)
       set(pickedCards, [currentPlayer.id, round], penaltyCards)
     } else {
@@ -95,11 +99,9 @@ function validateMove(currentMove, prevMove, currentPlayer) {
   }
   const card = currentMove[0]
   const lastCard = prevMove[0]
-  const hand = currentPlayer.getHand()
-// TODO: run card through elimination process instead.
 
   const cardVal  = Deck.cardValue(card)
-  const hasMoreCards = hand.length !== 0
+  const hasMoreCards = currentPlayer.isDone()
 
 
   if (cardVal === 8 && hasMoreCards) {
@@ -135,8 +137,8 @@ function validateStack(game) {
 
 
 function undoLastMove(game) {
-  const lastCard = game.tableStack.pop()
-  game.currentPlayer.receiveCards(lastCard)
+  const lastMove = game.tableStack.pop()
+  game.currentPlayer.getHand().concat(lastMove)
   return game
 }
 
@@ -163,4 +165,36 @@ function afterRound(game) {
   if (game.round > 100 || playersDone)
     game.isDone = true
   return game
+}
+
+
+
+function  playerMakeMove(playerState, gameRound) {
+  const state = playerState
+
+ if (!state.roundCache[gameRound]) {
+   state.roundCache[gameRound] = []
+ }
+
+ const currentRoundCache = state.roundCache[gameRound]
+ const hand = state.hand.getAll()
+ let hasUniqueCards = true
+ const isUniqueCard = (card) => currentRoundCache.indexOf(card) === -1
+ console.log(chalk.underline(`Attempted cards ${currentRoundCache}`));
+ const uniqueCards = hand.filter(isUniqueCard)
+ console.log(chalk.underline.magenta(`Players unique cards ----> `+ uniqueCards));
+ if (uniqueCards.length === 0) {
+   hasUniqueCards = false
+ }
+ if (hasUniqueCards) {
+   const uCard = uniqueCards[randomN(uniqueCards.length)]
+   const indexOfuCard = hand.indexOf(uCard)
+   const [cardToPlace] = state.hand.getAtIndex(indexOfuCard)
+   currentRoundCache.push(cardToPlace)
+   console.log(chalk.underline.yellow('CardToPlace -> ' + cardToPlace));
+   return [cardToPlace]
+
+ }
+ console.log(`HAS NO UNIQUE CARDS`);
+ return null
 }

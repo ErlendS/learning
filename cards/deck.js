@@ -58,14 +58,12 @@ function insertIntoSortedArray(x, sortedArray, compareFn) {
 }
 
 function createSortFn(compareFn) {
-  return function sort(deck) {
-    let currentCard = deck[0]
-    let newDeck = []
-    for (let i = 0; i < deck.length; i++) {
-      currentCard = deck[i]
-      newDeck = insertIntoSortedArray(currentCard, newDeck, compareFn)
+  return function sort(array) {
+    let sortedArray = []
+    for (let i = 0; i < array.length; i++) {
+      sortedArray = insertIntoSortedArray(array[i], sortedArray, compareFn)
     }
-    return newDeck
+    return sortedArray
   }
 }
 
@@ -79,9 +77,7 @@ function cardSuit(card) {
     return suit
 }
 
-function compareCardValues (card1, card2) {
-  const v1 = cardValue(card1)
-  const v2 = cardValue(card2)
+function compareCardValues (v1, v2) {
   if (v1 > v2 ) {
     return 1
   }
@@ -92,6 +88,7 @@ function compareCardValues (card1, card2) {
     return -1
   }
 }
+
 function generateShuffledDeck() {
   return shuffle(generateDeck())
 
