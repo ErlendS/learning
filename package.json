@@ -11,11 +11,11 @@
     "winston": "^2.3.0"
   },
   "devDependencies": {
-    "ava": "^0.15.2"
+    "ava": "^0.19.1"
   },
   "scripts": {
     "test": "NODE_ENV=test ava",
-    "watch": "NODE_ENV=test ava -w cards/**/*.js"
+    "watch": "NODE_ENV=test ava -w **/__tests__/**/*.js"
   },
   "repository": {
     "type": "git",
