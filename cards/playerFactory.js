@@ -6,6 +6,12 @@ const R = require('ramda')
 const randomN = (n) => Math.floor(Math.random() * 1000000) % n
 
 const createPlayer = (name, lifecycles = {}) => {
+// const createPlayer = (playerJson) => {
+//   playerJson = {
+//     id: 'a235sd564sad',
+//     name: 'erlend',
+//     hand: { fu: [], fd: [], hand: [] },
+//   }
 
   if (typeof lifecycles.makeMove !== 'function') {
     throw Error("createPlayer requires makeMove function")
@@ -42,5 +48,17 @@ const createPlayer = (name, lifecycles = {}) => {
 
   })
 }
+
+// Future shit:
+// function playerReducer(state, action) {
+//   const player = R.cloneDeep(state)
+//
+//   if (action.type === 'RECEIVED_CARDS') {
+//     player.fu.concat(action.cards);
+//     return player;
+//   }
+//
+//   return player;
+// }
 
 module.exports = createPlayer

@@ -16,5 +16,7 @@
     "prefer-const": 1,
     "object-shorthand": 1,
     "quote-props": [2, "as-needed"],
+    "no-undef": 2,
+    "no-unused-vars": 2,
   }
 }

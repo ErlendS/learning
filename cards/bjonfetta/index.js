@@ -3,11 +3,12 @@ const createPlayer = require('../playerFactory.js')
 const BjonfettaHand = require('./BjonfettaHand.js')
 const Deck = require('../deck.js')
 const utils = require('./bjonfettaUtils.js')
+const makeMove = require('./lifecycles/makeMove.js')
 const R = require('ramda')
 
-NUMBER_OF_PLAYERS = 3
+const NUMBER_OF_PLAYERS = 3
 
-bjonfettaAPI = gameFactory()
+const bjonfettaAPI = gameFactory()
 
 bjonfettaAPI.setLifecycle('initGame' , initGame)
 bjonfettaAPI.setLifecycle('setPlayerOrder' , setPlayerOrder)
@@ -40,7 +41,7 @@ function initGame(game) {
 
 function setPlayerOrder(game) {
   const transformPlayerFn = (player) => {
-    return PlayerObj = {
+    return {
       id: player.id,
       hand: player.getHand().getHand('hand')
     }
@@ -53,26 +54,35 @@ function setPlayerOrder(game) {
     R.map(transformPlayerFn)
   )
   const startingId = getIdOfStartingPlayer(game.players)
-  
+
   const getIndexOfStartingPlayer = R.findIndex(R.propEq(`id`, startingId))
   const indexOfStartingPlayer = getIndexOfStartingPlayer(game.players)
 
   const defaultOrder = R.range(0, NUMBER_OF_PLAYERS)
-  game.playerOrder = utils.shiftStartIndex(indexOfStartingPlayer)(defaultOrder)
+  game.playerOrder = utils.shiftStartIndex(indexOfStartingPlayer, defaultOrder)
 
   return game
 }
 
-function makeMove(game) {
+
+function validateStack(game) {
+  // returns true or false
   return game
 }
 
-function validateStack(game){
-  return game
-}
 function undoLastMove(game) {
+//
   return game
 }
+function afterPlayEffect(game) {
+  // Pick from deck if players move is []
+  // flip deck if 4 of a kind
+  // give card(s) to player if hand.length < 3
+
+
+  return game
+}
+// afterPlayEffect --- check tablestack for 4 of  a kind
 function afterRound(game) {
   if (game.round > 1)
     game.isDone = true

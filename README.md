@@ -63,6 +63,24 @@ git reset --hard
 git checkout [commit id]
 ```
 
+#### Working with branches
+```
+# checking out an existing branch
+git checkout [branch_name]
+eg: git checkout feature/someCoolFeature
+
+OBS checkout checks out branches not files, no .js
+
+
+# create new branches (from current branch)
+git checkout -b [branch_name]
+eg: git checkout -b features
+```
+
+Note: When workng with others, remember to:
+- `git pull` on existing branch before branching
+
+
 #### Clone a repository
 ```
 git clone [url]

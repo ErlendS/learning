@@ -180,9 +180,7 @@ function  playerMakeMove(playerState, gameRound) {
  const hand = state.hand.getAll()
  let hasUniqueCards = true
  const isUniqueCard = (card) => currentRoundCache.indexOf(card) === -1
- console.log(chalk.underline(`Attempted cards ${currentRoundCache}`));
  const uniqueCards = hand.filter(isUniqueCard)
- console.log(chalk.underline.magenta(`Players unique cards ----> `+ uniqueCards));
  if (uniqueCards.length === 0) {
    hasUniqueCards = false
  }

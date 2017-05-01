@@ -57,15 +57,6 @@ function insertIntoSortedArray(x, sortedArray, compareFn) {
   return sortedArray
 }
 
-function createSortFn(compareFn) {
-  return function sort(array) {
-    let sortedArray = []
-    for (let i = 0; i < array.length; i++) {
-      sortedArray = insertIntoSortedArray(array[i], sortedArray, compareFn)
-    }
-    return sortedArray
-  }
-}
 
 function cardValue(card) {
   const [suit, value] = card.split("_")
@@ -100,7 +91,6 @@ function generateShuffledDeck() {
    shuffle,
    cardValue,
    cardSuit,
-   createSortFn,
    compareCardValues,
    generateShuffledDeck,
  }
