@@ -1,5 +1,4 @@
 const uuid = require('uuid/v4')
-const chalk = require ('chalk')
 const R = require('ramda')
 
 // const randomN = (n) => Math.floor(Math.random() * 1000000) % n
@@ -16,38 +15,24 @@ const playerReducer = (playerState = initPlayer(), action = {}) => {
     return playerState
   }
 
-
-
-//   playerJson = {
-//     id: 'a235sd564sad',
-//     name: 'erlend',
-//     hand: { fu: [], fd: [], hand: [] },
-//   }
-
   if (type === 'MAKE_MOVE') {
-    const { move, handKey = 'hand' } = payload
+    const { move, handKey } = payload
     // const newPlayer = makeMove(playerState, move)
     return newPlayer
   }
 
   if (action.type === 'RECEIVED_CARDS') {
-    const { cards, handKey = 'hand' } = payload
+    const { cards, handKey } = payload
+    if(!R.contains(handKey, ['hand', 'fd', 'fu'])) {
+      return playerState
+    }
 
-    // const newHand = playerState['cards'][handKey].concat(cards);
     const newHand = R.compose(
       R.concat(cards),
       R.path(['cards', handKey])
     )(playerState)
-
     return R.assocPath(['cards', handKey], newHand, playerState)
   }
-  // if (action.type === 'RECEIVED_CARDS') {
-  //   const { cards, handKey = 'hand' } = payload
-  //   const newHand = playerState['cards'][handKey].concat(cards);
-  //   const newPlayerState = R.assocPath(['cards',handKey], newHand, playerState)
-  //
-  //   return newPlayerState;
-  // }
 
   return playerState;
 }
