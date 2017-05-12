@@ -17,8 +17,16 @@ const playerReducer = (playerState = initPlayer(), action = {}) => {
 
   if (type === 'MAKE_MOVE') {
     const { move, handKey } = payload
-    // const newPlayer = makeMove(playerState, move)
-    return newPlayer
+    if(!R.contains(handKey, ['hand', 'fd', 'fu'])) {
+      return playerState
+    }
+
+    const newHand = R.compose(
+      R.without(move),
+      R.path(['cards', handKey])
+    )(playerState)
+
+    return R.assocPath(['cards', handKey], newHand, playerState)
   }
 
   if (action.type === 'RECEIVED_CARDS') {
@@ -31,6 +39,7 @@ const playerReducer = (playerState = initPlayer(), action = {}) => {
       R.concat(cards),
       R.path(['cards', handKey])
     )(playerState)
+
     return R.assocPath(['cards', handKey], newHand, playerState)
   }
 

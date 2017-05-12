@@ -77,8 +77,9 @@ git checkout -b [branch_name]
 eg: git checkout -b features
 ```
 
-Note: When workng with others, remember to:
+Note: Remember to:
 - `git pull` on existing branch before branching
+- You will have to write `git --set-upstream origin [branch_name]` or `git push -u origin [branch_name]` for short
 
 
 #### Clone a repository
@@ -96,6 +97,10 @@ eg: npm install lodash
 
 # install and save to dependencies
 npm install [package_name] --save
+
+# run scripts
+npm run [file_name]
+eg: npm run test
 
 ```
 
