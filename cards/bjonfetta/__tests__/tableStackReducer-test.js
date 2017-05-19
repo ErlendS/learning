@@ -44,21 +44,6 @@ test('ADD_CARDS -- can add spesefied cards', t => {
 })
 
 
-// test('ADD_CARDS -- return tableStackState if invalid move', t => {
-//   const tableStackState = ['S_2', 'H_4']
-// const cards = [5, 5]
-//
-//   const actual = tableStackReducer(
-//     tableStackState,
-//     actionAddCards({ cards }))
-//
-//   const expected = tableStackState
-//
-//   t.deepEqual(expected, actual)
-//   t.true(expected === actual, 'Returns original object refrence')
-// })
-
-
 test('ADD_CARDS -- return tableStackState if invalid type', t => {
   const tableStackState = []
   const cards = ['D_12', 'H_3']
