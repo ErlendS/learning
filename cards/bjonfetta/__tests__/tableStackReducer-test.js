@@ -20,11 +20,56 @@ function actionRemoveCards({ cards }) {
   }
 }
 
+
+test('initializes state if state undefined ', t => {
+
+  const actual = tableStackReducer(undefined, undefined)
+
+  const expected = []
+
+  t.deepEqual(expected, actual)
+  t.true(expected !== actual, 'has to return a new object reference')
+})
+
+
+test('returns state if action is undefined ', t => {
+  const tableStackState = []
+  const actual = tableStackReducer(tableStackState, undefined)
+
+  const expected = tableStackState
+
+  t.deepEqual(expected, actual)
+  t.true(expected === actual, 'returns original object refrence')
+})
+
+
 test('reducer returns state when action is not recognized', t => {
-  const state = []
-  const actual = tableStackReducer(state)
-  const expected = state
-  t.true(expected === actual)
+  const tableStackState = []
+  const cards = ['D_12', 'H_3']
+
+  const actual = tableStackReducer(
+    tableStackState,
+    {
+      payload: { cards },
+      type: 'ADD_KARDS'
+    }
+  )
+
+  const expected = tableStackState
+
+  t.deepEqual(expected, actual)
+  t.true(expected === actual, 'Return original object refrence')
+})
+
+
+test('ADD_CARDS -- completes action if state is undefined', t => {
+  const cards = ['D_2', 'H_2']
+
+  const actual = tableStackReducer(undefined, actionAddCards({ cards }))
+  const expected = ['D_2', 'H_2']
+
+  t.deepEqual(expected, actual)
+  t.true(expected !== actual, 'has to retun a new object refrence')
 })
 
 
@@ -44,23 +89,7 @@ test('ADD_CARDS -- can add spesefied cards', t => {
 })
 
 
-test('ADD_CARDS -- return tableStackState if invalid type', t => {
-  const tableStackState = []
-  const cards = ['D_12', 'H_3']
 
-  const actual = tableStackReducer(
-    tableStackState,
-    {
-      payload: cards,
-      type: 'ADD_KARDS'
-    }
-  )
-
-  const expected = tableStackState
-
-  t.deepEqual(expected, actual)
-  t.true(expected === actual, 'Return original object refrence')
-})
 
 test('REMOVE_CARDS -- can remove spesefied cards', t => {
   const tableStackState = ['H_2', 'D_4', 'C_7', 'C_8', 'D_8' ]
@@ -77,24 +106,6 @@ test('REMOVE_CARDS -- can remove spesefied cards', t => {
   t.true(expected !== actual, 'has to return a new object refrence')
 })
 
-
-test('REMOVE_CARDS -- return tableStackState if invalid type', t => {
-  const tableStackState = ['H_2', 'D_4', 'C_7', 'C_8', 'D_9']
-  const cards =  ['D_9']
-
-  const actual = tableStackReducer(
-    tableStackState,
-    {
-      payload: { cards },
-      type: 'REMOVE_KARDS'
-    }
-  )
-
-  const expected = tableStackState
-
-  t.deepEqual(expected, actual)
-  t.true(expected === actual, 'returns orginal object refrence')
-})
 
 test('REMOVE_CARDS -- only removes cards in tablestack', t => {
   const tableStackState = ['H_2', 'D_4', 'C_7', 'C_8', 'D_8' ]
