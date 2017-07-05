@@ -43,10 +43,10 @@ test('utils.compareHands', t => {
 
 test ('utils.sortPlayers', t => {
   const playerArray = [
-    { id: 0, hand: ['X_2', 'X_3', 'X_10'] },
-    { id: 1, hand: ['X_2', 'X_3', 'X_3'] },
-    { id: 2, hand: ['X_2', 'X_2', 'X_10'] },
-    { id: 3, hand: ['X_4', 'X_3', 'X_10'] }
+    { id: 0, cards: {hand: ['X_2', 'X_3', 'X_10'] }},
+    { id: 1, cards: {hand: ['X_2', 'X_3', 'X_3'] }},
+    { id: 2, cards: {hand: ['X_2', 'X_2', 'X_10']} },
+    { id: 3, cards: {hand: ['X_4', 'X_3', 'X_10']} }
   ]
 
   const actual = utils.sortPlayers(playerArray)
@@ -105,18 +105,12 @@ test ('simpleMakeMove – choose lowest pair cards', t => {
   const expected = ['S_2', 'H_2']
   t.deepEqual(actual, expected)
 })
-test.skip('simpleMakeMove – choose to flip stack with four of a kind', t => {
-  const hand = ['S_2', 'H_15', 'E_4', 'D_7']
-  const tableStack = [['S_7', 'H_7'], ['E_15'], 'D_15', 'S_15']
+
+
+test ('simpleMakeMove – no cards', t => {
+  const hand = []
+  const tableStack = ['S_4', 'H_4', 'E_5', 'E_11']
   const actual = utils.simpleMakeMove(tableStack, hand)
-  const expected = ['D_15']
+  const expected = []
   t.deepEqual(actual, expected)
 })
-
-// test ('simpleMakeMove – pickFromDeck', t => {
-//   const hand = ['S_2', 'H_2', 'E_4', 'E_6']
-//   const tableStack = ['S_4', 'H_4', 'E_5', 'E_11']
-//   const actual = utils.simpleMakeMove(tableStack, hand)
-//   const expected = 'pfd'
-//   t.deepEqual(actual, expected)
-// })

@@ -2,42 +2,12 @@ const test = require('ava')
 const R = require('ramda')
 const uuid = require('uuid/v4');
 //const deepFreeze = require('deep-freeze')
-const playerReducer = require('../reducers/playerReducer')
+const playerReducer = require('../playerReducer')
+const { actionReciveCards, actionMakeMove } = require('../playerActions');
+// import playerAction from '../actions/playerActions'
 
 // flip and curry for composability
 const _playerReducer = R.flip(playerReducer)
-
-function actionReciveCards({ id, cards, handKey}) {
-  return {
-      payload: {
-        currentPlayerId: id,
-        cards,
-        handKey
-      },
-      type:'RECEIVED_CARDS'
-  }
-}
-
-// function actionSetName({ id, name }) {
-//   return {
-//     payload: {
-//       currentPlayerId: id,
-//       name,
-//     },
-//     type: 'SET_NAME',
-//   }
-// }
-
-function actionMakeMove({id, move, handKey})  {
-  return {
-    payload: {
-      currentPlayerId: id,
-      move,
-      handKey
-    },
-    type: 'MAKE_MOVE'
-  }
-}
 
 test('MAKE_MOVE -- empty move', t => {
   const playerState = playerReducer()

@@ -1,0 +1,234 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`appActions - createPlayers connects to playersReducer 1`] = `
+Object {
+  "deck": Array [],
+  "players": Object {
+    "Player_0": Object {
+      "cards": Object {
+        "fd": Array [],
+        "fu": Array [],
+        "hand": Array [],
+      },
+      "id": "Player_0",
+    },
+    "Player_1": Object {
+      "cards": Object {
+        "fd": Array [],
+        "fu": Array [],
+        "hand": Array [],
+      },
+      "id": "Player_1",
+    },
+    "Player_2": Object {
+      "cards": Object {
+        "fd": Array [],
+        "fu": Array [],
+        "hand": Array [],
+      },
+      "id": "Player_2",
+    },
+  },
+  "tableStack": Array [],
+}
+`;
+
+exports[`appReducer - connects to deckReducer 1`] = `
+Object {
+  "deck": Array [
+    "S_3",
+    "D_3",
+  ],
+  "players": Object {},
+  "tableStack": Array [],
+}
+`;
+
+exports[`appReducer - connects to playerReducer 1`] = `
+Object {
+  "deck": Array [],
+  "players": Object {
+    "Player_1": Object {
+      "cards": Object {
+        "fd": Array [],
+        "fu": Array [],
+        "hand": Array [],
+      },
+      "id": "Player_1",
+    },
+    "player_2": Object {
+      "cards": Object {
+        "fd": Array [],
+        "fu": Array [],
+        "hand": Array [],
+      },
+      "id": "player_2",
+    },
+  },
+  "tableStack": Array [],
+}
+`;
+
+exports[`appReducer - connects to tableStackReducer 1`] = `
+Object {
+  "deck": Array [],
+  "players": Object {},
+  "tableStack": Array [
+    "H_2",
+    "S_13",
+  ],
+}
+`;
+
+exports[`appReducer - createPlayers connects to playersReducer 1`] = `
+Object {
+  "deck": Array [],
+  "players": Object {
+    "Player_0": Object {
+      "cards": Object {
+        "fd": Array [],
+        "fu": Array [],
+        "hand": Array [],
+      },
+      "id": "Player_0",
+    },
+    "Player_1": Object {
+      "cards": Object {
+        "fd": Array [],
+        "fu": Array [],
+        "hand": Array [],
+      },
+      "id": "Player_1",
+    },
+    "Player_2": Object {
+      "cards": Object {
+        "fd": Array [],
+        "fu": Array [],
+        "hand": Array [],
+      },
+      "id": "Player_2",
+    },
+  },
+  "tableStack": Array [],
+}
+`;
+
+exports[`appReducer - initPlayersHands connects to the deck and the players modules 1`] = `
+Object {
+  "deck": Array [
+    "H_3",
+    "H_4",
+    "H_5",
+    "H_6",
+    "H_7",
+    "H_8",
+    "H_9",
+    "H_10",
+    "H_11",
+    "H_12",
+    "H_13",
+    "H_14",
+    "D_2",
+    "D_3",
+    "D_4",
+    "D_5",
+    "D_6",
+    "D_7",
+    "D_8",
+    "D_9",
+    "D_10",
+    "D_11",
+    "D_12",
+    "D_13",
+    "D_14",
+  ],
+  "players": Object {
+    "Player_0": Object {
+      "cards": Object {
+        "fd": Array [
+          "C_7",
+          "C_8",
+          "C_9",
+        ],
+        "fu": Array [
+          "S_11",
+          "S_12",
+          "S_13",
+        ],
+        "hand": Array [
+          "S_2",
+          "S_3",
+          "S_4",
+        ],
+      },
+      "id": "Player_0",
+    },
+    "Player_1": Object {
+      "cards": Object {
+        "fd": Array [
+          "C_10",
+          "C_11",
+          "C_12",
+        ],
+        "fu": Array [
+          "S_14",
+          "C_2",
+          "C_3",
+        ],
+        "hand": Array [
+          "S_5",
+          "S_6",
+          "S_7",
+        ],
+      },
+      "id": "Player_1",
+    },
+    "Player_2": Object {
+      "cards": Object {
+        "fd": Array [
+          "C_13",
+          "C_14",
+          "H_2",
+        ],
+        "fu": Array [
+          "C_4",
+          "C_5",
+          "C_6",
+        ],
+        "hand": Array [
+          "S_8",
+          "S_9",
+          "S_10",
+        ],
+      },
+      "id": "Player_2",
+    },
+  },
+  "tableStack": Array [],
+}
+`;
+
+exports[`appReducer - initializes state if inputs are undefined 1`] = `
+Object {
+  "deck": Array [],
+  "players": Object {},
+  "tableStack": Array [],
+}
+`;
+
+exports[`appReducer - returns state if action is invalid 1`] = `
+Object {
+  "deck": Array [],
+  "players": Object {
+    "Player_1": Object {
+      "cards": Object {
+        "fd": Array [],
+        "fu": Array [],
+        "hand": Array [],
+      },
+      "id": "Player_1",
+    },
+  },
+  "tableStack": Array [],
+}
+`;
