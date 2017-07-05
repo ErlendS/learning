@@ -9,7 +9,6 @@ const { actionReciveCards, actionMakeMove } = require('../playerActions');
 // flip and curry for composability
 const _playerReducer = R.flip(playerReducer)
 
-
 test('MAKE_MOVE -- empty move', t => {
   const playerState = playerReducer()
   const {id} = playerState

@@ -6,92 +6,59 @@ const Deck = require('./deck.js')
 
 const createDeck = Deck.generateShuffledDeck
 
-module.exports = function makeGame(initState = {}) {
-  let gameState = {
-    id: "001",
-    players: [],
-    playerOrder: [],
-    tableStack: CardStack(),
-    round: 0,
-    deck: CardStack(createDeck()),
-    currentPlayer: null,
-    ranking: [],
-    pickedCards: {},
-    history: [],
-    lifecycle: {
-      initGame: () => {},
-      makeMove: () => {},
-      validateStack: () => {},
-      undoLastMove: () => {},
-      afterPlayEffect: () => {},
-      afterRound: () => {},
-      setPlayerOrder: (_gameState) => {
-        const n = _gameState.players.length
-        const order = []
-        for (let i = 0; i < n; i++) {
-          order.push(i)
-        }
-        _gameState.playerOrder = order
-        return _gameState
-      },
-    }
-  }
-
-  gameState = Object.assign(gameState, initState)
+module.exports = function makeGame(lifecycles) {
 
   return Object.assign(
     {},
     {
-      setLifecycle: (name, fn) => {
-        gameState.lifecycle[name] = fn
-      },
-      addPlayer: (player) => {
-        gameState.players.push(player)
-      },
-      playGame: () => startGame(gameState),
-      // oneMove: () => gameState = oneMove(gameState),
-      // oneRound: () => gameState = oneRound(gameState),
+      playGame: gameState => startGame(lifecycles, gameState),
     }
   )
 }
 
-function startGame(gameState) {
+function startGame(lifecycles, gameState) {
   console.log('game started');
   const history = []
-
-  gameState = gameState.lifecycle.initGame(R.clone(gameState))
-  gameState = gameState.lifecycle.setPlayerOrder(R.clone(gameState))
-
+  gameState = lifecycles.initGame(R.clone(gameState))
+  console.log(gameState);
+  gameState = lifecycles.setPlayerOrder(R.clone(gameState))
   while (!gameState.isDone) {
-    console.log('-=-=--=-=- Starting round ' + gameState.round);
+    console.log('-=-=--=-=- Starting round ' + lifecycles.round);
     history.push(gameState)
-    // const currentGame = R.clone(gameState)
-    // gameState = oneRound(currentGame)
-    gameState = oneRound(R.clone(gameState))
-    gameState.round = gameState.round + 1
+    gameState = oneRound(R.clone(lifecycles), R.clone(gameState))
+    lifecycles.round = lifecycles.round + 1
   }
-  console.log('The Winners are ' + gameState.ranking.toString());
+  console.log('The Winners are ' + lifecycles.ranking.toString());
   console.log('game over');
 }
 
-function oneRound(gameState) {
-  for (let i = 0; i < gameState.players.length; i++) {
-    const n = gameState.playerOrder[i]
-    gameState.currentPlayer = gameState.players[n]
-    const player = gameState.currentPlayer
-    if (!gameState.currentPlayer.isDone()) {
-      gameState = gameState.lifecycle.makeMove(gameState)
-      if (!gameState.lifecycle.validateStack(gameState)) {
-        gameState.lifecycle.undoLastMove(gameState)
+function oneRound(lifecycles, gameState) {
+  console.log(gameState);
+  const playersKeys = R.keys(gameState.players)
+  for (let i = 0; i < playersKeys.length; i++) {
+    console.log('______________LOOP_________________');
+    // console.log(lifecycles.playerOrder)
+    const n = lifecycles.playerOrder[i]
+    const currentPlayer = gameState.players[playersKeys[n]]
+    // console.log(!currentPlayer.isDone());
+    if (!lifecycles.playerIsDone(currentPlayer)) {
+      console.log(`${currentPlayer.id} not done, attempt makeMove`);
+      const maybeValidGameState = lifecycles.makeMove(gameState, currentPlayer)
+      if (!lifecycles.validateStack(maybeValidGameState)) {
+        // lifecycles.undoLastMove(gameState)
         i--
         continue
+      } else {
+        // it is valid :)
+        gameState = maybeValidGameState
       }
+      console.log('valid move, stack now ' + gameState.tableStack);
 
-      gameState.lifecycle.afterPlayEffect(gameState)
+      lifecycles.afterPlayEffect(gameState)
     }
-
   }
-  gameState.lifecycle.afterRound(gameState)
+
+  lifecycles.afterRound(lifecycles, gameState)
 
   return gameState
 }

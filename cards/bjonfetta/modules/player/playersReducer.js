@@ -1,8 +1,6 @@
 const R = require('Ramda');
 const playerReducer = require('./playerReducer');
-const {
-  CREATE_PLAYER
-} = require('./playerActions')
+const { CREATE_PLAYER } = require('./playerActions')
 
 
 

@@ -1,92 +1,155 @@
 const gameFactory = require('../gameFactory.js')
-const createPlayer = require('../playerFactory.js')
-const BjonfettaHand = require('./BjonfettaHand.js')
-const Deck = require('../deck.js')
-const utils = require('./bjonfettaUtils.js')
-const makeMove = require('./lifecycles/makeMove.js')
-const R = require('ramda')
+const appReducer = require('./appReducer')
+const utils = require('./bjonfettaUtils')
+const { createPlayers, initPlayersHands } = require('./appActions')
+const { actions: playersActions } = require('./modules/player')
+const { actions: tableStackActions } = require('./modules/tableStack')
+const { actions: deckActions } = require('./modules/deck')
+const R = require('ramda');
+const { generateShuffledDeck } = require('../deck.js');
 
+const _appReducer = R.flip(appReducer)
 const NUMBER_OF_PLAYERS = 3
+const deck = generateShuffledDeck()
 
-const bjonfettaAPI = gameFactory()
+const lifecycles = {
+  initGame,
+  setPlayerOrder,
+  round: 0,
+  makeMove,
+  afterPlayEffect,
+  afterRound,
+  ranking: ['Nobody'],
+  playerIsDone,
+  validateStack,
+  playerOrder: []
 
-bjonfettaAPI.setLifecycle('initGame' , initGame)
-bjonfettaAPI.setLifecycle('setPlayerOrder' , setPlayerOrder)
-bjonfettaAPI.setLifecycle('makeMove' , makeMove)
-bjonfettaAPI.setLifecycle('validateStack' , validateStack)
-bjonfettaAPI.setLifecycle('undoLastMove' , undoLastMove)
-bjonfettaAPI.setLifecycle('afterRound' , afterRound)
-
-for (let i = 0; i < NUMBER_OF_PLAYERS; i++) {
-  bjonfettaAPI.addPlayer(createPlayer(`Player_${i}`, {
-    makeMove,
-    initHand: BjonfettaHand,
-  }))
 }
+const bjonfettaAPI = gameFactory(lifecycles) // <-- inversion of control
 
 bjonfettaAPI.playGame()
 
-function initGame(game) {
-  const { players } = game
-  for (let i = 0; i < NUMBER_OF_PLAYERS; i++) {
-    const playerHand = players[i].getHand()
-    playerHand.reciveCards(game.deck.getN(3), "hand")
-    playerHand.reciveCards(game.deck.getN(3), "fu")
-    playerHand.reciveCards(game.deck.getN(3), "fd")
-    console.log(playerHand);
-  }
-  return game
-  // Option to switch
+function initGame(state) {
+  return R.compose(
+    _state => R.reduce(appReducer, _state, initPlayersHands(undefined, _state)),
+    _appReducer(deckActions.setDeck({ deck })),
+    _state => R.reduce(appReducer, _state, createPlayers({ n: NUMBER_OF_PLAYERS }, _state))
+  )(state)
+}
+// troubleshoot: in initgame when we call appReducer with state(which is gameState from gameFactory),
+// redux will ignore the gameState keys which hasn't been preloaded.
+// So all keys are there before reduc run, which is why we can run gameState.lifecycle.initGame,
+// but the keys are removed once we call appReducer. that's why setPlayerOrder is undefined.
+function setPlayerOrder(state) {
+  const playerOrder = utils.sortPlayers(R.values(state.players))
+  const startingPlayerId = R.head(playerOrder).id
+  const indexOfStartingPlayer = R.findIndex(
+    R.propEq('id', startingPlayerId),
+    R.values(state.players)
+  )
+
+  const defaultOrder = R.range(0, NUMBER_OF_PLAYERS)
+  lifecycles.playerOrder = utils.shiftStartIndex(indexOfStartingPlayer, defaultOrder)
+  return state
 }
 
-function setPlayerOrder(game) {
-  const transformPlayerFn = (player) => {
-    return {
-      id: player.id,
-      hand: player.getHand().getHand('hand')
+
+function makeMove(state, currentPlayer) {
+  if (state.deck.length !== 0) {
+    const handKey = 'hand'
+    const cardsToPlace = utils.simpleMakeMove(state.tableStack, currentPlayer.cards.hand)
+    console.log(`Deck is not empty - card to place ${cardsToPlace}`);
+    if (cardsToPlace.length === 0) {
+      return playerTakesChance(state, currentPlayer)
+
+    } else {
+      return R.compose(
+        _appReducer(playersActions.actionMakeMove(
+          { id: currentPlayer.id,
+            move: cardsToPlace,
+            handKey }
+          )),
+        _appReducer(tableStackActions.actionAddCards({ cards: cardsToPlace }))
+      )(state)
     }
   }
 
-  const getIdOfStartingPlayer = R.compose(
-    R.prop('id'),
-    R.head,
-    utils.sortPlayers,
-    R.map(transformPlayerFn)
-  )
-  const startingId = getIdOfStartingPlayer(game.players)
+  else {
+    // find handKey to use
+    const handKeys = ['hand', 'fu', 'fd']
+    for (let i = 0; i <= 2; i++) {
+      // if player has card in handKey, player starts to make move
+      if (R.length(currentPlayer.cards[handKeys[i]]) === 0) { continue }
 
-  const getIndexOfStartingPlayer = R.findIndex(R.propEq(`id`, startingId))
-  const indexOfStartingPlayer = getIndexOfStartingPlayer(game.players)
+      const cards = utils.simpleMakeMove(state.tableStack, currentPlayer.cards[handKeys[i]])
 
-  const defaultOrder = R.range(0, NUMBER_OF_PLAYERS)
-  game.playerOrder = utils.shiftStartIndex(indexOfStartingPlayer, defaultOrder)
-
-  return game
+      if (R.length(cards) === 0) {
+        // player recives tableStack
+        const tableStack = state.tableStack
+        const newState = appReducer(state, tableStackActions.actionRemoveCards({ cards:tableStack }))
+        return appReducer(newState, playersActions.actionReciveCards({
+          id: currentPlayer.id,
+          move: tableStack,
+          handKey: handKeys[i]
+        }))
+      }
+      // player makesMove
+      return appReducer(playersActions.actionMakeMove({
+        id: currentPlayer.id,
+        cards,
+        handKey: handKeys[i]
+      }))
+    }
+  }
 }
 
 
-function validateStack(game) {
-  // returns true or false
-  return game
+function validateStack(state) {
+  // the only time we need to validate stack is when player has taken a chanceCard
+  // so it only needs to check last to cards?
+  // or should validateFn check entire tableStack?
+  return true
 }
 
-function undoLastMove(game) {
-//
-  return game
-}
-function afterPlayEffect(game) {
-  // Pick from deck if players move is []
-  // flip deck if 4 of a kind
-  // give card(s) to player if hand.length < 3
 
-
-  return game
-}
-// afterPlayEffect --- check tablestack for 4 of  a kind
-function afterRound(game) {
-  if (game.round > 1)
-    game.isDone = true
-  return game
+function afterPlayEffect() {
+  // check hand.length, if less than 3, hand deck is still in game, deal cards to player
 }
 
-// --- Bjonfetta utility functions ---
+function playerIsDone(player) {
+  return R.compose(
+    R.equals(0),
+    R.sum,
+    R.map(R.length),
+    R.values,
+    R.prop('cards')
+  )(player)
+}
+
+
+function afterRound(lifecycles, state) {
+  if (lifecycles.round > 2)
+    state.isDone = true
+  return state
+}
+
+function playerTakesChance(state, currentPlayer) {
+  const chanceCard = R.head(state.deck)
+  console.log('no card to place, picking card from deck')
+  console.log(`card from deck ${chanceCard}`);
+  let newState = appReducer(state, deckActions.removeFromDeck({ cards: chanceCard }))
+  newState = appReducer(newState, tableStackActions.actionAddCards({ cards: chanceCard}))
+
+  if (validateStack(newState) === true) {
+    return newState
+
+  } else {
+    const tableStack = state.tableStack
+    newState = appReducer(newState, tableStackActions.actionRemoveCards({ cards: tableStack }))
+    return appReducer(newState, playersActions.actionReciveCards({ id: currentPlayer.id, cards: tableStack, handKey: 'hand' }))
+  }
+}
+
+// const state = appReducer(undefined, undefined)
+// const newState = initGame(state)
+// console.log(setPlayerOrder(newState));

@@ -1,9 +1,22 @@
 const R = require('ramda')
 const Deck = require('../deck.js')
-const CardStack = require('../cardStackFactory.js')
 
 
 const utils = {}
+
+
+utils.repeatEach = R.curryN(2, (items, n) =>
+  R.chain(R.repeat(R.__, n), items))
+
+
+utils.zipWith3 = function zipWith3(xs, ys, zs ) {
+  const args = []
+  for (let i = 0; i < zs.length; i++) {
+    args.push([xs[i], ys[i], zs[i]])
+  }
+  return args
+}
+
 
 /*
  * flattenPlayer
@@ -67,8 +80,8 @@ utils.compareHands = function compareHands(hand1, hand2) {
 }
 
 utils.comparePlayers = function comparePlayers(player1 ,player2) {
-  const p1Hand = player1.hand
-  const p2Hand = player2.hand
+  const p1Hand = player1.cards.hand
+  const p2Hand = player2.cards.hand
   return utils.compareHands(p1Hand, p2Hand)
 }
 
@@ -122,25 +135,13 @@ utils.simpleMakeMove = R.curryN(2, (tableStack, hand) =>
 const practicallyEquals = R.curryN(2, (a, b) =>
   utils.parsePracticalValue(a) === utils.parsePracticalValue(b)
 )
-const isEqualToFirstCardOf = R.compose(practicallyEquals, R.head)
 
-const slctCards = (hand) => R.takeWhile(isEqualToFirstCardOf(hand))(hand)
-
-// chooses first card from sorted hand, and
 utils.selectCards = function selectCards(hand) {
-  const equalsFirstOf = R.compose(
-    practicallyEquals,
-    R.head
-  )
-
-  const pickFirst = R.takeWhile(equalsFirstOf(hand))
-  return pickFirst(hand)
+  const equalsFirstCard = R.compose(practicallyEquals, R.head)(hand)
+  return R.takeWhile(equalsFirstCard, hand)
 }
 
 
-//utils.selectCards = slctCards
-
-//filterHand can return undefined if 15 is the only card in tableStack
 utils.filterHand = R.curryN(2, function filterHand(tableStack, hand) {
   const prevCard = R.last(R.flatten(tableStack))
   if (typeof prevCard !== "string") {
@@ -149,13 +150,13 @@ utils.filterHand = R.curryN(2, function filterHand(tableStack, hand) {
   const prevCardValue = utils.parsePracticalValue(prevCard)
 
   if (prevCardValue === 15) {
-    rTableStack = R.compose(R.reverse, R.flatten)(tableStack)
-    fTableStack = R.filter(notPrevCard(prevCard), rTableStack)
-    return filterHand(fTableStack, hand)
+    return filterHand(R.dropLast(1, tableStack), hand)
   }
+
   if (prevCardValue !== 7) {
     return R.filter(higherThan(prevCard), hand)
     }
+
   if (prevCardValue === 7) {
     return R.filter(lowerThanAndIncludesFifteen(prevCard), hand)
   }
@@ -174,13 +175,6 @@ const lowerThanAndIncludesFifteen = prevCard => (card) => {
     return true
   }
   if (utils.parsePracticalValue(card) === 15) {
-    return true
-  }
-}
-
-
-const notPrevCard = prevCard => (card) => {
-  if (utils.compareCards(card, prevCard) !== 0) {
     return true
   }
 }

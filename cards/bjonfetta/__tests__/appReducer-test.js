@@ -35,7 +35,6 @@ test('appReducer - initPlayersHands connects to the deck and the players modules
     _appReducer(deckActions.setDeck({ deck })),
     _state => R.reduce(appReducer, _state, createPlayers({ n: 3 }, _state))
   )(initState)
-  console.log(R.values(state.players));
   t.snapshot(state)
   t.true(initState !== state)
 })
