@@ -10,8 +10,9 @@ body {
 }
 
 .content {
-  display: inline-block;
-  padding: 0 20% 0 20%;
+  text-align: center;
+  /*display: inline-block;*/
+  /*padding: 0 20% 0 20%;*/
 }
 
 .header {
@@ -22,38 +23,63 @@ body {
   font-weight: bold;
   margin: 30px;
 }
+
 .prices {
-  display: flex;
+  text-align: center;
   justify-content: center;
   font-family: Arial ,sans-serif;
   word-spacing: 2px;
+  max-width: 790px;
+  margin: auto;
 }
 
 h2 {
   margin: 5px auto 5px auto;
   opacity: 0.8;
 }
-.freemium {
+
+.flex {
+  display: flex;
+}
+
+
+.price-box {
+  text-align: left;
   box-sizing: border-box;
-  margin: 8px;
   padding: 26px;
-  order: 1;
+  margin: 8px;
+  font-family: inherit;
   background-color: white;
   border-radius: 2%;
-  font-family: inherit;
-  width: 366px;
+  flex-grow: 1;
+  transform: translateY(0px);
+  transition: transform 0.3s ease-in,
+              box-shadow 0.3s linear;
+}
+
+.price-box:hover {
+  transform: translateY(-15px);
+}
+
+.price-box.freemium {
   box-shadow: -2px 0px 20px 0px rgba(0, 0, 0, 0.3)
 }
-
-.freemium:hover {
-  transform: translateY(-15px);
-  box-shadow: -5px 10px 30px 0px rgba(0, 0, 0, 0.3)
-
+.price-box.freemium:hover {
+  box-shadow: -10px 10px 30px 0px rgba(0, 0, 0, 0.4)
 }
 
-.freemium p {
+
+.price-box.premium {
+  box-shadow: 3px 0px 20px 0px rgba(0, 0, 0, 0.3);
+}
+.price-box.premium:hover {
+  box-shadow: 10px 10px 30px 0px rgba(0, 0, 0, 0.4)
+}
+
+.price-box p {
   margin: 0;
 }
+
 
 .freemium ul {
   border-top: 1px solid rgba(199, 199, 199, 0.8);
@@ -62,8 +88,8 @@ h2 {
   margin: 0;
   list-style-type: none;
   line-height: 3.4ex;
-
 }
+
 .freemium li::before {
   content: "\2713\0020";
   padding-right: 1em;
@@ -73,27 +99,10 @@ h2 {
   opacity: 0.3
 }
 
-.premium {
-  box-sizing: border-box;
-  padding: 26px;
-  margin: 8px;
-  font-family: inherit;
-  order: 2;
-  background-color: white;
-  border-radius: 2%;
-  width: 366px;
-  box-shadow: 3px 0px 20px 0px rgba(0, 0, 0, 0.3);
-}
+.f-35 { font-size: 35px; }
+.bold { font-weight: bold; }
 
-.premium:hover {
-  transform: translateY(-15px);
-  box-shadow: 5px 10px 30px 0px rgba(0, 0, 0, 0.3)
 
-}
-
-.premium p {
-  margin: 0;
-}
 
 #boxHeader {
   height: 110px;
@@ -109,7 +118,7 @@ h2 {
   line-height: 3.4ex;
 
 }
-.premium li:before {
+.premium li::before {
   content: "\2713\0020";
   padding-right: 1em;
 }
@@ -149,4 +158,28 @@ a:hover {
 .terms a {
   text-decoration: underline;
   color: white;
+}
+
+@media (max-width: 780px) {
+  .prices {
+    display: block;
+  }
+  .prices > .flex {
+    display: block;
+  }
+  .price-box {
+    width: auto;
+    margin: 20px;
+  }
+  .btn {
+    display: inline-block;
+  }
+  .image {
+    overflow-y: scroll;
+  }
+  .terms {
+    width: auto;
+    margin-left: 20px;
+    margin-right: 20px;
+  }
 }
