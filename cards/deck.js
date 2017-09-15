@@ -25,10 +25,10 @@ function generateDeck() {
  // omplasser to tilfeldige verdier i deck arrayen 15000 ganger
  function shuffle(_deck) {
    const deck = R.clone(_deck)
-
+   const nCards = _deck.length
    // velg et tilfeldig tall mellom 0-51
    function positionInArray() {
-     return Number.parseInt(Math.random() * 1000000 % 52)
+     return Number.parseInt(Math.random() * 1000000 % nCards)
    }
    for(let i = 0; i < 15000; i++) {
      const firstPosition = positionInArray()
@@ -57,17 +57,6 @@ function insertIntoSortedArray(x, sortedArray, compareFn) {
   return sortedArray
 }
 
-function createSortFn(compareFn) {
-  return function sort(deck) {
-    let currentCard = deck[0]
-    let newDeck = []
-    for (let i = 0; i < deck.length; i++) {
-      currentCard = deck[i]
-      newDeck = insertIntoSortedArray(currentCard, newDeck, compareFn)
-    }
-    return newDeck
-  }
-}
 
 function cardValue(card) {
   const [suit, value] = card.split("_")
@@ -79,9 +68,7 @@ function cardSuit(card) {
     return suit
 }
 
-function compareCardValues (card1, card2) {
-  const v1 = cardValue(card1)
-  const v2 = cardValue(card2)
+function compareCardValues (v1, v2) {
   if (v1 > v2 ) {
     return 1
   }
@@ -92,6 +79,7 @@ function compareCardValues (card1, card2) {
     return -1
   }
 }
+
 function generateShuffledDeck() {
   return shuffle(generateDeck())
 
@@ -103,7 +91,6 @@ function generateShuffledDeck() {
    shuffle,
    cardValue,
    cardSuit,
-   createSortFn,
    compareCardValues,
    generateShuffledDeck,
  }

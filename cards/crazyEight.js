@@ -1,7 +1,14 @@
+const { get, set, flatten } = require('lodash');
+const { type } = require('ramda');
+const chalk = require ('chalk')
 const makeGame = require('./gameFactory.js');
 const Deck = require('./deck.js')
 const Player = require('./playerFactory.js');
-const { get, set } = require('lodash');
+const CardStack = require('./cardStackFactory.js')
+
+
+const randomN = (n) => Math.floor(Math.random() * 1000000) % n
+
 
 const NUMBER_OF_PLAYERS = 4
 
@@ -16,7 +23,11 @@ crazyEightAPI.setLifecycle('afterPlayEffect', afterPlayEffect)
 crazyEightAPI.setLifecycle('afterRound', afterRound)
 
 for (let i = 0; i < NUMBER_OF_PLAYERS; i++) {
-  crazyEightAPI.addPlayer(Player('player_' + i))
+  const name = 'player_' + i
+  crazyEightAPI.addPlayer(Player(name, {
+    makeMove: playerMakeMove,
+    initHand: CardStack,
+  }))
 }
 
 crazyEightAPI.playGame()
@@ -24,7 +35,7 @@ crazyEightAPI.playGame()
 function initGame(game) {
   for (let i = 0; i < NUMBER_OF_PLAYERS; i++) {
     const someCards = game.deck.getN(6)
-    game.players[i].receiveCards(someCards)
+    game.players[i].getHand().concat(someCards)
   }
 
   const [oneCard] = game.deck.getN(1)
@@ -35,33 +46,31 @@ function initGame(game) {
     console.error('Warning: you 99% surly have too many players.');
   }
 
-  // const randomNumberOf = n => {
-  //   return Math.floor(Math.random() * 1000000) % n
-  // }
-  //
-  // function attemptPlaceFistCard() {
-  //   let card = getCardsFromDeck(1)
-  //   if (card.includes('8')) {
-  //     // place card back in random position in deck
-  //     game.deck.splice(randomNumberOf(game.deck.length), 0, card)
-  //     return attemptPlaceFistCard()
-  //   }
-  //   function placeCardOnTopOfTableStack(card, tableStack) {}
-  // }
   return game
 }
-// player_1 start game
-
 function makeMove(game) {
-  const { currentPlayer, tableStack } = game
-  const theMove = currentPlayer.makeMove(game.round)
+  const { currentPlayer, tableStack, deck } = game
+  const cardsLeftInDeck = deck.getAll().length
+ console.log(cardsLeftInDeck + ' CARDSLEFT');
+ if (cardsLeftInDeck === 0) {
+   console.log(`Shuffling tablestack`);
+   const prevMove = tableStack.getN(1)
+   const cardsToShuffle = flatten(tableStack.getAll())
+   const newDeck = Deck.shuffle(cardsToShuffle)
 
+   console.log(require('util').inspect(prevMove, { depth: null }));
+   console.log(require('util').inspect(newDeck, { depth: null }));
+   deck.set(newDeck)
+   tableStack.set(prevMove)
+ }
+
+  const theMove = currentPlayer.makeMove(game.round)
   if (theMove === null) {
     const {pickedCards, round } = game
     let penaltyCards = get(game, ['pickedCards', currentPlayer.id, round], [])
     if (penaltyCards.length <= 2) {
       const cards = game.deck.getN(1)
-      currentPlayer.receiveCards(cards)
+      currentPlayer.getHand().concat(cards)
       penaltyCards = penaltyCards.concat(cards)
       set(pickedCards, [currentPlayer.id, round], penaltyCards)
     } else {
@@ -73,52 +82,63 @@ function makeMove(game) {
     return makeMove(game)
   }
 
-  console.log(`==> MAKE MOVE: Player ${currentPlayer.name} – ${theMove}`);
-  // console.log(theMove);
-
-
   tableStack.push(theMove)
-    return game
-
-
-
-
+  return game
 }
+
+
+
 function validateMove(currentMove, prevMove, currentPlayer) {
+  if (type(currentMove[0]) !== 'String') {
+    console.log(require('util').inspect(currentMove, { depth: null }));
+    console.log(require('util').inspect(currentMove[0], { depth: null }));
+    console.log(typeof currentMove[0]);
+
+    console.log(chalk.red('Warning: No card found in move!'));
+    throw Error('I TOLD YOU MOTHERFUCKER! CURRENTMOVE IS NOT AN ARRAY!')
+  }
   const card = currentMove[0]
   const lastCard = prevMove[0]
-  const hand = currentPlayer.getHand()
-// TODO: run card through elimination process instead.
-  if (Deck.cardValue(card) === 8 && hand.length !== 0) {
-    console.log('==> Cannot finish with an 8');
+
+  const cardVal  = Deck.cardValue(card)
+  const hasMoreCards = currentPlayer.isDone()
+
+
+  if (cardVal === 8 && hasMoreCards) {
+    console.log('==> Valid move, can finish with an 8');
     return true
   }
   if (Deck.cardSuit(card) === Deck.cardSuit(lastCard)) {
-    console.log(`==> Wrong suit, should be ${Deck.cardSuit(lastCard)}`);
+    console.log(`==> Valid move, suit is ${Deck.cardSuit(lastCard)}`);
     return true
   }
   if (Deck.cardValue(card) === Deck.cardValue(lastCard)) {
-    console.log(`==> Wrong value, should be ${Deck.cardValue(lastCard)}`);
+    console.log(`==> Valid move, value is ${Deck.cardValue(lastCard)}`);
     return true
   }
+  console.log(`Invalid move: ${card} on ${lastCard}`);
   return false
 }
 
 function validateStack(game) {
   const stackOfCards = game.tableStack.getAll()
+  if (stackOfCards.length <= 1) {
+    return true
+  }
 
   const i = stackOfCards.length - 1
   const currentMove = stackOfCards[i]
   const prevCard = stackOfCards[i - 1]
   const currentPlayer = game.currentPlayer
+  console.log(chalk.white(`Table card is ${prevCard}, attempting to place "${currentMove}"`));
   return validateMove(currentMove, prevCard, currentPlayer)
 
 }
 
 
 function undoLastMove(game) {
-  const lastCard = game.tableStack.pop()
-  game.currentPlayer.receiveCards(lastCard)
+  const lastMove = game.tableStack.pop()
+  game.currentPlayer.getHand().concat(lastMove)
   return game
 }
 
@@ -130,9 +150,49 @@ function afterRound(game) {
   const playersDone = game.players.reduce((allDone, player) =>
     player.isDone() && allDone, true
   )
-  console.log('<><><><><><><><><><><><><><><><><><><><><><><><><>');
-  if (game.round > 1 || playersDone)
-    game.isDone = true
+    const {ranking, players } = game
+    const nPlayers = players.length
+    for (let i = 0; i < nPlayers; i++) {
+      const player = players[i]
+      if (player.isDone() && !ranking.includes(player.getName())) {
+        return ranking.push(player.getName())
+        }
+      }
 
+
+  console.log('Round ' + game.round);
+  console.log('<><><><><><><><><><><><><><><><><><><><><><><><><>');
+  if (game.round > 100 || playersDone)
+    game.isDone = true
   return game
+}
+
+
+
+function  playerMakeMove(playerState, gameRound) {
+  const state = playerState
+
+ if (!state.roundCache[gameRound]) {
+   state.roundCache[gameRound] = []
+ }
+
+ const currentRoundCache = state.roundCache[gameRound]
+ const hand = state.hand.getAll()
+ let hasUniqueCards = true
+ const isUniqueCard = (card) => currentRoundCache.indexOf(card) === -1
+ const uniqueCards = hand.filter(isUniqueCard)
+ if (uniqueCards.length === 0) {
+   hasUniqueCards = false
+ }
+ if (hasUniqueCards) {
+   const uCard = uniqueCards[randomN(uniqueCards.length)]
+   const indexOfuCard = hand.indexOf(uCard)
+   const [cardToPlace] = state.hand.getAtIndex(indexOfuCard)
+   currentRoundCache.push(cardToPlace)
+   console.log(chalk.underline.yellow('CardToPlace -> ' + cardToPlace));
+   return [cardToPlace]
+
+ }
+ console.log(`HAS NO UNIQUE CARDS`);
+ return null
 }

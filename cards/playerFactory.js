@@ -1,65 +1,64 @@
 const uuid = require('uuid/v4')
+const chalk = require ('chalk')
 const CardStack = require('./cardStackFactory.js')
+const R = require('ramda')
 
 const randomN = (n) => Math.floor(Math.random() * 1000000) % n
 
-const playerFactory = (name) => {
-  const state = {
+const createPlayer = (name, lifecycles = {}) => {
+// const createPlayer = (playerJson) => {
+//   playerJson = {
+//     id: 'a235sd564sad',
+//     name: 'erlend',
+//     hand: { fu: [], fd: [], hand: [] },
+//   }
+
+  if (typeof lifecycles.makeMove !== 'function') {
+    throw Error("createPlayer requires makeMove function")
+  }
+
+  if (typeof lifecycles.initHand !== 'function') {
+    throw Error("createPlayer requires initHand function")
+  }
+
+
+  const playerState = {
     id: uuid(),
     name,
-    hand: CardStack(),
+    // hand: CardStack(),
+    hand: lifecycles.initHand(),
     roundCache: [],
     }
 
-  return Object.freeze({
-    id: state.id,
-    name: state.name,
 
-    receiveCards: (cards) => {
-      state.hand.concat(cards)
-    },
-    makeMove: (gameRound) => {
-      if (!state.roundCache[gameRound]) {
-        state.roundCache[gameRound] = []
-      }
+  return Object.assign({
+    id: playerState.id,
+    name: playerState.name,
 
-      const currentRoundCache = state.roundCache[gameRound]
-      const hand = state.hand.getAll()
-      let hasUniqueCards = true
-      const isUniqueCard = (card) => currentRoundCache.indexOf(card) === -1
-      console.log(currentRoundCache);
-      const uniqueCards = hand.filter(isUniqueCard)
-      console.log(`Players unique cards ----> `+ uniqueCards);
-      if (uniqueCards.length === 0) {
-        hasUniqueCards = false
-      }
-      if (hasUniqueCards) {
-        const uCard = uniqueCards[randomN(uniqueCards.length)]
-        const indexOfuCard = hand.indexOf(uCard)
-        const [cardToPlace] = state.hand.getAtIndex(indexOfuCard)
-        currentRoundCache.push(cardToPlace)
-        console.log('cardToPlace');
-        console.log(cardToPlace);
-        return [cardToPlace]
+    makeMove: (...args) => lifecycles.makeMove(playerState, ...args),
 
-        /* TODO:
-        returning null forces player to pick one new card
-          if he has 0 uniqueCards, reciveOneCard, and add +1
-          on cardsRecivedThisRound
-          maximum 3 times
-          after 3 times on to next player
-        */
-      }
-      console.log(`HAS NO UNIQUE CARDS`);
-      return null
-    },
-    getHand: () => state.hand.getAll(),
+    getHand: (...args) => R.clone(playerState.hand),
+
+    getName: () => playerState.name,
 
     printCards: () => {
-      console.log(state.hand.toString())
+      console.log(playerState.hand.toString())
     },
-    isDone: () => state.hand.getAll().length === 0
+    isDone: () => playerState.hand.isEmpty(),
+
   })
 }
 
-module.exports = playerFactory
+// Future shit:
+// function playerReducer(state, action) {
+//   const player = R.cloneDeep(state)
+//
+//   if (action.type === 'RECEIVED_CARDS') {
+//     player.fu.concat(action.cards);
+//     return player;
+//   }
+//
+//   return player;
+// }
+
+module.exports = createPlayer

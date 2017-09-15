@@ -1,86 +1,64 @@
 const R = require('ramda')
+const chalk = require ('chalk')
 const CardStack = require('./cardStackFactory.js')
 const Deck = require('./deck.js')
 
+
 const createDeck = Deck.generateShuffledDeck
 
-module.exports = function makeGame(initState = {}) {
-  let gameState = {
-    id: "001",
-    players: [],
-    tableStack: CardStack(),
-    round: 0,
-    deck: CardStack(createDeck()),
-    currentPlayer: null,
-    pickedCards: {},
-    history: [],
-    lifecycle: {
-      initGame: () => {},
-      makeMove: () => {},
-      validateStack: () => {},
-      undoLastMove: () => {},
-      afterPlayEffect: () => {},
-      afterRound: () => {},
-    }
-  }
-
-  gameState = Object.assign(gameState, initState)
+module.exports = function makeGame(lifecycles) {
 
   return Object.assign(
     {},
     {
-      setLifecycle: (name, fn) => {
-        gameState.lifecycle[name] = fn
-      },
-      addPlayer: (player) => {
-        gameState.players.push(player)
-      },
-      playGame: () => startGame(gameState),
-      // oneMove: () => gameState = oneMove(gameState),
-      // oneRound: () => gameState = oneRound(gameState),
+      playGame: gameState => startGame(lifecycles, gameState),
     }
   )
 }
 
-
-function startGame(gameState) {
+function startGame(lifecycles, gameState) {
   console.log('game started');
   const history = []
-
-  gameState = gameState.lifecycle.initGame(R.clone(gameState))
-
+  gameState = lifecycles.initGame(R.clone(gameState))
+  console.log(gameState);
+  gameState = lifecycles.setPlayerOrder(R.clone(gameState))
   while (!gameState.isDone) {
-    console.log('-=-=--=-=- Starting round ' + gameState.round);
+    console.log('-=-=--=-=- Starting round ' + lifecycles.round);
     history.push(gameState)
-    // const currentGame = R.clone(gameState)
-    // gameState = oneRound(currentGame)
-    gameState = oneRound(R.clone(gameState))
-    gameState.round = gameState.round + 1
+    gameState = oneRound(R.clone(lifecycles), R.clone(gameState))
+    lifecycles.round = lifecycles.round + 1
   }
-
+  console.log('The Winners are ' + lifecycles.ranking.toString());
   console.log('game over');
 }
 
-function oneRound(gameState) {
-  for (let i = 0; i < gameState.players.length; i++) {
-    gameState.currentPlayer = gameState.players[i]
-    console.log('Current Player is ' + gameState.currentPlayer.name)
+function oneRound(lifecycles, gameState) {
+  console.log(gameState);
+  const playersKeys = R.keys(gameState.players)
+  for (let i = 0; i < playersKeys.length; i++) {
+    console.log('______________LOOP_________________');
+    // console.log(lifecycles.playerOrder)
+    const n = lifecycles.playerOrder[i]
+    const currentPlayer = gameState.players[playersKeys[n]]
+    // console.log(!currentPlayer.isDone());
+    if (!lifecycles.playerIsDone(currentPlayer)) {
+      console.log(`${currentPlayer.id} not done, attempt makeMove`);
+      const maybeValidGameState = lifecycles.makeMove(gameState, currentPlayer)
+      if (!lifecycles.validateStack(maybeValidGameState)) {
+        // lifecycles.undoLastMove(gameState)
+        i--
+        continue
+      } else {
+        // it is valid :)
+        gameState = maybeValidGameState
+      }
+      console.log('valid move, stack now ' + gameState.tableStack);
 
-    if (!gameState.currentPlayer.isDone()) {
-      gameState = gameState.lifecycle.makeMove(gameState)
+      lifecycles.afterPlayEffect(gameState)
     }
-
-    if (!gameState.lifecycle.validateStack(gameState)) {
-      gameState.lifecycle.undoLastMove(gameState)
-      i--
-      continue
-    }
-
-    gameState.lifecycle.afterPlayEffect(gameState)
-    // if unvalid move, currentPlayer same,
-    // get last tableStack (or remove last value)
-    // OBS ------>  !i++
   }
-  gameState.lifecycle.afterRound(gameState)
+
+  lifecycles.afterRound(lifecycles, gameState)
+
   return gameState
 }
