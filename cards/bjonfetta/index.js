@@ -7,6 +7,7 @@ const { actions: tableStackActions } = require('./modules/tableStack')
 const { actions: deckActions } = require('./modules/deck')
 const R = require('ramda');
 const { generateShuffledDeck } = require('../deck.js');
+const { validateStack } = require('./lifecycles.js')
 
 const _appReducer = R.flip(appReducer)
 const NUMBER_OF_PLAYERS = 3
@@ -104,16 +105,11 @@ function makeMove(state, currentPlayer) {
 }
 
 
-function validateStack(state) {
-  // the only time we need to validate stack is when player has taken a chanceCard
-  // so it only needs to check last to cards?
-  // or should validateFn check entire tableStack?
-  return true
-}
-
 
 function afterPlayEffect() {
   // check hand.length, if less than 3, hand deck is still in game, deal cards to player
+  // if 10, clear tableStack
+  // if 4 of a kind, clear tableStack
 }
 
 function playerIsDone(player) {
@@ -133,6 +129,7 @@ function afterRound(lifecycles, state) {
   return state
 }
 
+
 function playerTakesChance(state, currentPlayer) {
   const chanceCard = R.head(state.deck)
   console.log('no card to place, picking card from deck')
@@ -144,7 +141,8 @@ function playerTakesChance(state, currentPlayer) {
     return newState
 
   } else {
-    const tableStack = state.tableStack
+    console.log('Not valid, player recives tableStack');
+    const tableStack = newState.tableStack
     newState = appReducer(newState, tableStackActions.actionRemoveCards({ cards: tableStack }))
     return appReducer(newState, playersActions.actionReciveCards({ id: currentPlayer.id, cards: tableStack, handKey: 'hand' }))
   }

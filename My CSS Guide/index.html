@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Erlends Neat and Handy Guide!</title>
+    <link rel="stylesheet" href="./style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.js"></script>
+    <script src="./main.js"></script>
+  </head>
+  <body>
+    <h1 class="header"> Erlends Neat and Handy Guide to Understand CSS stuff!</h1>
+    <div class="page">
+      <ul class="nav">
+       <li> The Box Model
+         <ul class="subNav">
+           <li> What is it? </li>
+           <li> Box-sizing </li>
+         </ul>
+       </li>
+       <li> CSS Layout
+         <ul class="subNav">
+           <li> Display </li>
+           <li> Position </li>
+           <li> Float and Clear </li>
+           <li> Flex </li>
+         </ul>
+       </li>
+       <li> The Defaults
+         <ul class="subNav">
+           <li> &lt;div&gt; </li>
+           <li> &lt;span&gt; </li>
+           <li> &lt;img&gt; </li>
+           <li> &lt;section&gt; </li>
+           <li> &lt;h1-6&gt; </li>
+           <li> &lt;p&gt; </li>
+         </ul>
+       </li>
+
+      </ul>
+      <div class="main">
+         <h2> The Box Model </h2>
+         <h3> What is it? </h3>
+         <p> The CSS Box Model describes how CSS structure elements created in a document tree. Each element
+           is placed in  it's own rectangular box, and each box contains a content area, and have the option to have a
+           padding, border and/or margin area.
+         </p>
+          <img src="http://blog.teamtreehouse.com/wp-content/uploads/2012/10/box-model.png">
+         <h6> The classic box model, the content area is the only necessary of the four, the rest allows for more style options. Note that the margin area is always transparent.
+         </h6>
+          <p> Incase you need a reminder of what an element is, it comes from HTML and usally consist of a start tag "<" and and end tag"/>"
+            paragraphs &lt;p&gt;, headers &lt;h1-h6&gt; and lists &lt;ul&gt;, &lt;li&gt; are all HTML elements. Everything of content on your website are created my elements. And the box model
+            describes how they are styled and placed on the site.
+          </p>
+          <p> But enough theory, let's look at an example of the box model in action! This example will show
+            nested elements in an unordered list.
+          </p>
+          <p> Here is the code snippet for this example </p>
+          <pre class="code">
+  .ul {
+    background-color: yellow;
+    margin: 0;
+    padding: 10px;
+  }
+  .li_1 {
+    background-color: hotPink;
+    margin:10px;
+  }
+  li_2 {
+    margin: 0;
+  }
+          </pre>
+          <!-- <div class="example" id="example_1"> -->
+            <ul class="ul1">
+              <li id="li1"> I'm my own element with my own box model, I'm nested inside the Ul element. That means I'm a child element of the Ul </li>
+              <li id="li2"> I'm also a child element, my width is the same as the one above me, but my margins are set to zero.</li>
+            </ul>
+          <!-- </div> -->
+       </div>
+     </div>
+    <!-- crete elements and show how the box model work -->
+  </body>
+</html>
